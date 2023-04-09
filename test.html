@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+  <head> </head>
+  <body>
+    <script>
+      const formData = new FormData()
+      formData.append('mangaName', 'hi')
+      fetch('http://localhost:3000/dev/manga', {
+        method: 'post',
+        body: formData,
+      })
+        .then((res) => res.json())
+        .then((res) => console.log(res))
+    </script>
+  </body>
+</html>

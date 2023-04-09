@@ -1,0 +1,68 @@
+useDotenv: true
+
+service: MangaApp
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+
+functions:
+  healthcheck:
+    handler: src/handlers/healthcheck.handler
+    events:
+      - http:
+          path: /healthcheck
+          # path: /healthcheck/{id} (defines path param)
+          method: get
+          # request:
+          #   parameters:
+          #     paths:
+          #       deviceId: true (ture means required)
+          #   querystrings:
+          #     includeDeleted: false
+          # bodyType: 'DeviceRequest' (body data type displays in swagger, defined in swagger type files)
+
+          # The types to define swagger response
+          responseData:
+            '200':
+              description: '200 response'
+              bodyType: 'DummyResponse'
+  createManga:
+    handler: src/handlers/createManga.handler
+    events:
+      - http:
+          path: /manga
+          method: post
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+
+custom:
+  autoswagger:
+    title: 'string'
+    apiType: 'httpApi'
+    generateSwaggerOnDeploy: true
+    typefiles: ['./src/types/api-types.d.ts']
+    swaggerFiles: []
+    host: ${env:HOST_URL}
+    basePath: '/dev'
+    schemes: ['http', 'https']
+    useRedirectUI: true
+  static:
+    folder: ./
+    port: 3001
+
+plugins:
+  - serverless-auto-swagger
+  - serverless-dotenv-plugin
+  - serverless-offline
+  - serverless-plugin-static
+  - serverless-plugin-typescript
+
+package:
+  patterns:
+    - '!node_modules/.prisma/client/libquery_engine-*'
+    - '!node_modules/@prisma/engines/**'
+    - '!node_modules/prisma/libquery_engine-*'
+    - 'node_modules/.prisma/client/libquery_engine-rhel-*'

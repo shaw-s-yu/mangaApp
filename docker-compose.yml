@@ -1,0 +1,16 @@
+version: "3.5"
+
+services:
+  postgres:
+    container_name: manga_postgres
+    image: postgres:15
+    env_file:
+      - .env
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    ports:
+      - 5556:5432
+    restart: always
+
+volumes:
+  postgres:
