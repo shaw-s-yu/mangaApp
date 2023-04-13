@@ -20,11 +20,12 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
       }
     })
 
-    await buildMangaCollection(id, path)
+    const message = await buildMangaCollection(id, path)
+
     return {
       statusCode: 200,
       body: JSON.stringify({
-        message: 'done',
+        message,
       }),
     }
   } catch (err: unknown) {

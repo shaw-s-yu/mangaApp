@@ -81,6 +81,7 @@ export default function UploadView({ setScreen }) {
 
           <div className={classes.input}>
             <LoadingButton
+              disabled={mangaName == null || mangaDescription == null || previewImage == null || path == null}
               size="small"
               color="secondary"
               onClick={async () => {
