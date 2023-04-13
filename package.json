@@ -1,5 +1,5 @@
 {
-  "name": "severless-template",
+  "name": "severless-template-manga-app",
   "version": "0.0.1",
   "description": "A template for a Serverless API using Typescript and prisma",
   "main": "functions/healthcheck.js",
