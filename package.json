@@ -8,6 +8,7 @@
     "dotenv": "^16.0.3",
     "dotenv-cli": "^7.0.0",
     "form-data": "^4.0.0",
+    "fs": "^0.0.1-security",
     "lambda-multipart-parser": "^1.0.1",
     "uuid": "^9.0.0"
   },
@@ -34,7 +35,7 @@
   },
   "scripts": {
     "build": "sls generate-swagger",
-    "dev": "npx dotenv -v HOST_URL=localhost:3000 sls offline start --noPrependStageInUrl",
+    "dev": "npx dotenv -v HOST_URL=localhost:5000 sls offline start --noPrependStageInUrl --httpPort 5000",
     "prisma-generate": "npx dotenv -e .env npx prisma generate",
     "prisma-migrate": "npx dotenv -e .env -- npx prisma migrate dev --name postgres-init",
     "docker": "docker-compose up -d && yarn prisma-migrate"

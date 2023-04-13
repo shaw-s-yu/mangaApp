@@ -4,7 +4,8 @@ service: MangaApp
 
 provider:
   name: aws
-  runtime: nodejs16.x
+  runtime: nodejs18.x
+  timeout: 120
 
 functions:
   healthcheck:
@@ -51,7 +52,9 @@ custom:
     useRedirectUI: true
   static:
     folder: ./
-    port: 3001
+    port: 5001
+  serverless-offline:
+    httpPort: 5000
 
 plugins:
   - serverless-auto-swagger

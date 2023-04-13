@@ -9,8 +9,16 @@ services:
     volumes:
       - postgres:/var/lib/postgresql/data
     ports:
-      - 5556:5432
+      - 5432:5432
     restart: always
 
+  pgadmin:
+    container_name: pgadmin4_container
+    image: dpage/pgadmin4
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "5050:80"
 volumes:
   postgres:

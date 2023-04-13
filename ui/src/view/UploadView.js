@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 import { makeStyles } from '@mui/styles'
+import { LoadingButton } from '@mui/lab';
 import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
-// import { validate_path, get_chapter_name } from '../../utils/utils'
-// import axios from 'axios'
-// import urls from '../../utils/urls'
+import { SERVER_URL } from '../utils/config'
+import { fetchApi } from '../utils/apiHelper'
 
 const useStyles = makeStyles({
   root: {
@@ -33,13 +33,14 @@ export default function UploadView({ setScreen }) {
 
   const [mangaName, setMangaName] = useState('')
   const [mangaDescription, setMangaDescription] = useState('')
-  const [files, setFiles] = useState([])
+  const [path, setPath] = useState('')
   const [previewImage, setPreviewImage] = useState(null)
+  const [loading, setLoading] = useState(false)
 
   return (
     <React.Fragment>
       <div className={classes.root}>
-        Upload By Whole Manga
+        Format files into Manga Collection
         <div className={classes.container}>
           <Button onClick={() => setScreen(0)} variant="contained">
             Go Back
@@ -70,70 +71,35 @@ export default function UploadView({ setScreen }) {
             />
           </div>
 
-          <div className={classes.input}>pick a directory</div>
-          <div className={classes.input}>
-            <input
-              type="file"
-              webkitdirectory="true"
-              multiple
-              onChange={(e) => {
-                console.log(e.target.files)
-                // let uploaded_files = validate_path([...e.target.files])
-                // uploaded_files.sort((a, b) => {
-                //   const f1 = Number(a.name.split('.')[0])
-                //   const f2 = Number(b.name.split('.')[0])
-                //   return f1 !== f2 ? (f1 < f2 ? -1 : 1) : 0
-                // })
-                // setFiles(uploaded_files)
-              }}
-            />
-          </div>
+          <TextField
+            className={classes.input}
+            label="File Path"
+            variant="outlined"
+            value={path}
+            onChange={(e) => setPath(e.target.value)}
+          />
 
           <div className={classes.input}>
-            <Button
-              disabled={!files.length > 0}
-              onClick={() => {
-                if (mangaName === '' || mangaDescription === '' || !previewImage) {
-                  alert('manga name/description cannot be empty')
-                  return
-                }
-
-                const formData = new FormData()
-
-                formData.append('mangaName', mangaName)
-                formData.append('mangaDesc', mangaDescription)
-                formData.append('previewImage', previewImage)
-
-                const filenames = files.map((_, i) => 'file' + i)
-                formData.append('filenames', filenames)
-
-                // let chapterList = {}
-
-                // for (let i = 0; i < files.length; i++) {
-                //   const chapter = get_chapter_name(files[i])
-                //   formData.append(filenames[i], files[i])
-                //   formData.append(filenames[i] + '_chapter', chapter)
-                //   if (chapterList[chapter] === undefined) chapterList[chapter] = 1
-                // }
-                // chapterList = Object.keys(chapterList)
-                // formData.append('chapterlist', chapterList)
-
-                // axios.post(urls.upload_manga, formData).then((res) => {
-                //   const { err, msg } = res.data
-                //   if (err) alert(msg)
-                //   else window.location.reload()
-                // })
+            <LoadingButton
+              size="small"
+              color="secondary"
+              onClick={async () => {
+                setLoading(true)
+                const formdata = new FormData()
+                formdata.append('previewImage', previewImage);
+                formdata.append('mangaName', mangaName);
+                formdata.append('mangaDescription', mangaDescription);
+                formdata.append('path', path);
+                const response = await fetchApi(`${SERVER_URL}/manga`, 'POST', formdata);
+                setLoading(false)
+                alert(JSON.stringify(response))
               }}
+              loading={loading}
+              loadingPosition="start"
               variant="contained"
             >
-              submit
-            </Button>
-          </div>
-          <div className={classes.input}>
-            file list:
-            {files.map((e, i) => (
-              <div key={i}>{e.webkitRelativePath}</div>
-            ))}
+              <span>Save</span>
+            </LoadingButton>
           </div>
         </div>
       </div>

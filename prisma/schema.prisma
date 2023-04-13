@@ -11,14 +11,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Mangas {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  name        String
+model Mangas {  
+  id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  name              String
+  description       String
+  previewImagePath  String
 }
 
-model Chapter {
+model Chapters {
   id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -26,11 +28,11 @@ model Chapter {
   mangaId     String   
 }
 
-model Page {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  index       Int
-  path        String
-  chapterId   String
+model Pages {
+  id                  String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  index               Int
+  path                String
+  chapterId           String
 }
