@@ -6,54 +6,41 @@
  */
 
 import React from 'react';
-import {
-  SafeAreaView,
-  Text,
-  View
-} from 'react-native';
-
-import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
+import {NavigationContainer} from '@react-navigation/native';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/Ionicons';
-
+import HomeScreen from './src/view/home/HomeScreen.react';
+import SettingsScreen from './src/view/settings/SettingsScreen.react';
 const Tab = createBottomTabNavigator();
-
-function HomeScreen() {
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Home!</Text>
-    </View>
-  );
-}
-
-function SettingsScreen() {
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Settings!</Text>
-    </View>
-  );
-}
 
 export default function App(): JSX.Element {
   return (
     <NavigationContainer>
       <Tab.Navigator
         initialRouteName="Home"
-        screenOptions={({ route }) => ({
-          tabBarIcon: ({ color, size }) => {
+        screenOptions={({route}) => ({
+          tabBarIcon: ({color, size}) => {
             let iconName: string = 'search';
 
             if (route.name === 'Home') {
-              iconName = 'ios-home-outline'
+              iconName = 'ios-home-outline';
             } else if (route.name === 'Profile') {
-              iconName = 'search'
+              iconName = 'search';
             }
-            return <Icon name={iconName} size={size} color={color} />;
-          }
-        })}
-      >
+            return (
+              <Icon
+                name={iconName}
+                size={size}
+                color={color}
+              />
+            );
+          },
+        })}>
         <Tab.Screen name="Home" component={HomeScreen} />
-        <Tab.Screen name="Settings" component={SettingsScreen} />
+        <Tab.Screen
+          name="Settings"
+          component={SettingsScreen}
+        />
       </Tab.Navigator>
     </NavigationContainer>
   );

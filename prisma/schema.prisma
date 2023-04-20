@@ -36,3 +36,11 @@ model Pages {
   path                String
   chapterId           String
 }
+
+model Histories {
+  id                  String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt 
+  mangaId             String? @unique
+  pageId              String?
+}

@@ -36,8 +36,76 @@ functions:
           method: post
           cors:
             origin: '*'
-            headers:
-              - Content-Type
+
+  getManga:
+    handler: src/handlers/getMangas.handler
+    events:
+      - http:
+          path: /manga/{id}
+          method: get
+          cors:
+            origin: '*'
+      - http:
+          path: /manga
+          method: get
+          cors:
+            origin: '*'
+  getChapter:
+    handler: src/handlers/getChapters.handler
+    events:
+      - http:
+          path: /chapter/{id}
+          method: get
+          cors:
+            origin: '*'
+  getCurrentPage:
+    handler: src/handlers/getCurrentPage.handler
+    events:
+      - http:
+          path: /page/{id}/current
+          method: get
+          cors:
+            origin: '*'
+  getNextPage:
+    handler: src/handlers/getNextPage.handler
+    events:
+      - http:
+          path: /page/{id}/next
+          method: get
+          cors:
+            origin: '*'
+  getPrevPage:
+    handler: src/handlers/getPrevPage.handler
+    events:
+      - http:
+          path: /page/{id}/prev
+          method: get
+          cors:
+            origin: '*'
+  getFirstPage:
+    handler: src/handlers/getFirstPage.handler
+    events:
+      - http:
+          path: /page/{id}/first
+          method: get
+          cors:
+            origin: '*'
+  createHistory:
+    handler: src/handlers/createHistory.handler
+    events:
+      - http:
+          path: /history/{chapterId}/{id}
+          method: post
+          cors:
+            origin: '*'
+  getHistory:
+    handler: src/handlers/getHistory.handler
+    events:
+      - http:
+          path: /history/{id}
+          method: get
+          cors:
+            origin: '*'
 
 custom:
   autoswagger:
@@ -52,9 +120,10 @@ custom:
     useRedirectUI: true
   static:
     folder: ./
-    port: 5001
+    port: 5556
   serverless-offline:
-    httpPort: 5000
+    httpPort: 5555
+    host: '0.0.0.0'
 
 plugins:
   - serverless-auto-swagger
