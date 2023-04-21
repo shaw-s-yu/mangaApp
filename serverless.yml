@@ -5,7 +5,7 @@ service: MangaApp
 provider:
   name: aws
   runtime: nodejs18.x
-  timeout: 120
+  timeout: 1200
 
 functions:
   healthcheck:
