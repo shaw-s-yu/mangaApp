@@ -6,7 +6,6 @@ import {
 } from '@react-navigation/native'
 import { useEffect, useState } from 'react'
 import { Image, View } from 'react-native'
-import { fetchApi } from '../../utils/apiHelper'
 import {
   SERVER_API_URL,
   SERVER_STATIC_URL,
@@ -29,11 +28,13 @@ export default (): JSX.Element => {
   const fetch = useApiFetcher()
 
   useEffect(() => {
-    fetch(
-      `${SERVER_API_URL}/history/${chapterID}/${pageID}`,
-      'POST'
-    )
-  }, [fetch])
+    const handleCreateHistory = async () =>
+      await fetch(
+        `${SERVER_API_URL}/history/${chapterID}/${pageID}`,
+        'POST'
+      )
+    handleCreateHistory()
+  }, [pageID])
   return (
     <ShimmerPlaceholder fallback={<PageShimmer />}>
       <View

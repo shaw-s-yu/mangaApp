@@ -13,7 +13,6 @@ export default (): any => {
       method: API_METHOD_TYPE,
       body?: any
     ) => {
-      console.log(url)
       setLoading(true)
       const response = await fetchApi(url, method, body)
       setLoading(false)

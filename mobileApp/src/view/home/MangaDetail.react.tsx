@@ -6,7 +6,6 @@ import {
   NavigationProp,
 } from '@react-navigation/native'
 import { useEffect, useState } from 'react'
-import { fetchApi } from '../../utils/apiHelper'
 import { SERVER_API_URL } from '../../utils/config'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { useIsFocused } from '@react-navigation/native'
@@ -54,7 +53,7 @@ export default (): JSX.Element => {
       handleFetchChapters()
       handleFetchHistory()
     }
-  }, [id, setHistoryChapter, setHistoryPage])
+  }, [id, setHistoryChapter, setHistoryPage, isFocused])
   return (
     <View>
       {historyChapter != null && historyPage != null && (
