@@ -5,16 +5,21 @@
  * @format
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/Ionicons';
 import HomeScreen from './src/view/home/HomeScreen.react';
 import SettingsScreen from './src/view/settings/SettingsScreen.react';
+import { ApiFetcherContext } from './src/context/ApiFetcherContext';
+
+
 const Tab = createBottomTabNavigator();
 
 export default function App(): JSX.Element {
+  const [loading, setLoading] = useState<boolean>(false)
   return (
+    <ApiFetcherContext.Provider value={{loading, setLoading}}>
     <NavigationContainer>
       <Tab.Navigator
         initialRouteName="Home"
@@ -43,5 +48,6 @@ export default function App(): JSX.Element {
         />
       </Tab.Navigator>
     </NavigationContainer>
+    </ApiFetcherContext.Provider>
   );
 }

@@ -1,94 +1,98 @@
-import {Button, Text, View} from 'react-native';
+import { Button, Text, View } from 'react-native'
 import {
   RouteProp,
   useRoute,
   useNavigation,
   NavigationProp,
-} from '@react-navigation/native';
-import {useEffect, useState} from 'react';
-import {fetchApi} from '../../utils/apiHelper';
-import {SERVER_API_URL} from '../../utils/config';
-import {TouchableOpacity} from 'react-native-gesture-handler';
-import {useIsFocused} from '@react-navigation/native';
+} from '@react-navigation/native'
+import { useEffect, useState } from 'react'
+import { fetchApi } from '../../utils/apiHelper'
+import { SERVER_API_URL } from '../../utils/config'
+import { TouchableOpacity } from 'react-native-gesture-handler'
+import { useIsFocused } from '@react-navigation/native'
+import useApiFetcher from '../../hooks/useApiFetcher'
 
 type ChapterType = {
-  name: string;
-  id: string;
-};
+  name: string
+  id: string
+}
 
 export default (): JSX.Element => {
-  const route = useRoute<RouteProp<any>>();
-  const isFocused = useIsFocused();
-  const navigation = useNavigation<NavigationProp<any>>();
-  const {id} = route.params ?? {};
+  const route = useRoute<RouteProp<any>>()
+  const isFocused = useIsFocused()
+  const navigation = useNavigation<NavigationProp<any>>()
+  const { id } = route.params ?? {}
   const [chapters, setChapters] = useState<
     Array<ChapterType>
-  >([]);
+  >([])
   const [historyChapter, setHistoryChapter] =
-    useState<any>();
-  const [historyPage, setHistoryPage] = useState<any>();
+    useState<any>()
+  const [historyPage, setHistoryPage] = useState<any>()
+  const fetch = useApiFetcher()
   useEffect(() => {
     const handleFetchChapters = async () => {
-      const {chapters} = await fetchApi(
+      const { chapters } = await fetch(
         `${SERVER_API_URL}/chapter/${id}`,
-        'GET',
-      );
+        'GET'
+      )
       setChapters([
-        ...chapters.map(({name = '', id = ''}) => ({
+        ...chapters.map(({ name = '', id = '' }) => ({
           name,
           id,
         })),
-      ]);
-    };
-    const handleFetchHistory = async () => {
-      const {chapter, page} = await fetchApi(
-        `${SERVER_API_URL}/history/${id}`,
-        'GET',
-      );
-      setHistoryChapter(chapter);
-      setHistoryPage(page);
-    };
-    if (isFocused) {
-      handleFetchChapters();
-      handleFetchHistory();
+      ])
     }
-  }, [id, setHistoryChapter, setHistoryPage]);
+    const handleFetchHistory = async () => {
+      const { chapter, page } = await fetch(
+        `${SERVER_API_URL}/history/${id}`,
+        'GET'
+      )
+      setHistoryChapter(chapter)
+      setHistoryPage(page)
+    }
+    if (isFocused) {
+      handleFetchChapters()
+      handleFetchHistory()
+    }
+  }, [id, setHistoryChapter, setHistoryPage])
   return (
     <View>
       {historyChapter != null && historyPage != null && (
         <Button
           onPress={async () => {
-            const {page} = await fetchApi(
-              `${SERVER_API_URL}/page/${historyPage.id}/current`,
-              'GET',
-            );
+            const { page } = await fetch(
+              `${SERVER_API_URL}/page/${historyPage?.id}/current`,
+              'GET'
+            )
             navigation.navigate('MangaPage', {
               pageID: page.id,
               pagePath: page.path,
               chapterID: page.chapterId,
-            });
+            })
           }}
           title={`Resume read chapter ${historyChapter.name} page ${historyPage.index}`}
         />
       )}
-      {chapters.map(({name, id}) => (
+      {chapters.map(({ name, id }) => (
         <View key={id}>
           <TouchableOpacity
             onPress={async () => {
-              const {page} = await fetchApi(
+              const { page } = await fetch(
                 `${SERVER_API_URL}/page/${id}/first`,
-                'GET',
-              );
+                'GET'
+              )
+              console.log(page)
               navigation.navigate('MangaPage', {
                 pageID: page.id,
                 pagePath: page.path,
                 chapterID: page.chapterId,
-              });
-            }}>
+              })
+            }}
+          >
             <Text>{name}</Text>
           </TouchableOpacity>
         </View>
       ))}
     </View>
-  );
-};
+  )
+}
