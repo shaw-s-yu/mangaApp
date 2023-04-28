@@ -5,7 +5,11 @@ import {
   useRoute,
 } from '@react-navigation/native'
 import { useEffect, useState } from 'react'
-import { Image, View } from 'react-native'
+import {
+  Image,
+  View,
+  useWindowDimensions,
+} from 'react-native'
 import {
   SERVER_API_URL,
   SERVER_STATIC_URL,
@@ -13,19 +17,19 @@ import {
 import useApiFetcher from '../../hooks/useApiFetcher'
 import ShimmerPlaceholder from '../../components/ShimmerPlaceholder.react'
 import PageShimmer from '../../components/shimmers/PageShimmer.react'
+import ZoomableScrollView from '../../components/ZoomableScrollView.react'
+import { useHeaderHeight } from '@react-navigation/elements'
+import ImageCropper from '../../components/ImageCropper.react'
 
 export default (): JSX.Element => {
-  const [wrapperLayout, setWrapperLayout] = useState<{
-    x: number
-    y: number
-  }>({
-    x: 0,
-    y: 0,
-  })
   const route = useRoute<RouteProp<any>>()
   const { chapterID, pageID, pagePath } = route.params ?? {}
   const navigation = useNavigation<NavigationProp<any>>()
   const fetch = useApiFetcher()
+  const { height, width } = useWindowDimensions()
+  const headerHeight = useHeaderHeight()
+  const [isCropping, setIsCropping] =
+    useState<boolean>(false)
 
   useEffect(() => {
     const handleCreateHistory = async () =>
@@ -36,23 +40,21 @@ export default (): JSX.Element => {
     handleCreateHistory()
   }, [pageID])
   return (
-    <ShimmerPlaceholder fallback={<PageShimmer />}>
-      <View
-        onLayout={(e) =>
-          setWrapperLayout({
-            x: e.nativeEvent.layout.width,
-            y: e.nativeEvent.layout.height,
-          })
-        }
-        onTouchStart={async (e) => {
+    <View>
+      <ZoomableScrollView
+        scrollable={!isCropping}
+        style={{
+          width: width,
+          height: height - headerHeight - 80,
+        }}
+        onPress={async (e) => {
           const { pageX } = e.nativeEvent
           let page
-          if (pageX < wrapperLayout.x / 2) {
+          if (pageX < width / 2) {
             const res = await fetch(
               `${SERVER_API_URL}/page/${pageID}/prev`,
               'GET'
             )
-            console.log(res)
             page = res.page
           } else {
             const res = await fetch(
@@ -69,14 +71,25 @@ export default (): JSX.Element => {
           })
         }}
       >
-        <Image
-          style={{ height: 1000, width: 800 }}
-          source={{
-            uri: `${SERVER_STATIC_URL}/${pagePath}`,
-          }}
-          resizeMode="contain"
-        />
-      </View>
-    </ShimmerPlaceholder>
+        <ImageCropper
+          isCropping={isCropping}
+          imageUri={`${SERVER_STATIC_URL}/${pagePath}`}
+          setIsCropping={setIsCropping}
+        >
+          <ShimmerPlaceholder fallback={<PageShimmer />}>
+            <Image
+              style={{
+                height: height - headerHeight - 80,
+                width: width,
+              }}
+              source={{
+                uri: `${SERVER_STATIC_URL}/${pagePath}`,
+              }}
+              resizeMode="contain"
+            />
+          </ShimmerPlaceholder>
+        </ImageCropper>
+      </ZoomableScrollView>
+    </View>
   )
 }
