@@ -56,7 +56,8 @@ def hello_world():
 
     return {
         'english':translatedEnglish,
-        'mandarin':translatedMandarin
+        'mandarin':translatedMandarin,
+        'original':text
     }
 
 if __name__ == "__main__":
