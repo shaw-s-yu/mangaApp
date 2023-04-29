@@ -83,6 +83,8 @@ export default function ImageCropper({
           )
         }}
         onTouchMove={(event) => {
+          //   console.log('hi')
+          //   event.stopPropagation()
           if (duration < pressDuration) {
             return
           }

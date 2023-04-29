@@ -3,7 +3,6 @@ import requests
 from io import BytesIO
 from PIL import Image
 # will convert the image to text string
-import pytesseract
 from manga_ocr import MangaOcr
 
 mocr = MangaOcr()

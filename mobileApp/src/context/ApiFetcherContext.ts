@@ -1,13 +1,17 @@
 import React, { useContext } from 'react'
 
+export type TLoadingMap = {
+  [key: string]: boolean
+}
+
 export type ApiFetcherContextValue = {
-  loading: boolean
-  setLoading: (isLoading: boolean) => void
+  loadingMap: TLoadingMap
+  setLoadingMap: (loadingMap: TLoadingMap) => void
 }
 
 const _default: ApiFetcherContextValue = {
-  loading: false,
-  setLoading: () => {},
+  loadingMap: {},
+  setLoadingMap: () => {},
 }
 
 export const ApiFetcherContext =

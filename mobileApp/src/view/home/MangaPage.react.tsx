@@ -1,30 +1,38 @@
 import {
-  NavigationProp,
   RouteProp,
-  useNavigation,
   useRoute,
 } from '@react-navigation/native'
 import { useEffect, useState } from 'react'
-import {
-  Image,
-  View,
-  useWindowDimensions,
-} from 'react-native'
+import { View, useWindowDimensions } from 'react-native'
 import {
   SERVER_API_URL,
   SERVER_STATIC_URL,
 } from '../../utils/config'
 import useApiFetcher from '../../hooks/useApiFetcher'
-import ShimmerPlaceholder from '../../components/ShimmerPlaceholder.react'
+import ShimmerPlaceholder from '../../components/shimmers/ShimmerPlaceholder.react'
 import PageShimmer from '../../components/shimmers/PageShimmer.react'
 import ZoomableScrollView from '../../components/ZoomableScrollView.react'
 import { useHeaderHeight } from '@react-navigation/elements'
 import ImageCropper from '../../components/ImageCropper.react'
+import React from 'react'
 
-export default (): JSX.Element => {
+const Image = React.lazy(() => import('./Image.react'))
+
+export default (): JSX.Element | null => {
   const route = useRoute<RouteProp<any>>()
-  const { chapterID, pageID, pagePath } = route.params ?? {}
-  const navigation = useNavigation<NavigationProp<any>>()
+  const {
+    chapterID: currentChapterID,
+    pageID: currentPageID,
+    pagePath: currentPagePath,
+  } = route.params ?? {}
+  const [chapterID, setChapterID] = useState<string>(
+    currentChapterID
+  )
+  const [pageID, setPageID] =
+    useState<string>(currentPageID)
+  const [pagePath, setPagePath] =
+    useState<string>(currentPagePath)
+
   const fetch = useApiFetcher()
   const { height, width } = useWindowDimensions()
   const headerHeight = useHeaderHeight()
@@ -37,9 +45,13 @@ export default (): JSX.Element => {
         `${SERVER_API_URL}/history/${chapterID}/${pageID}`,
         'POST'
       )
-    handleCreateHistory()
-  }, [pageID])
-  return (
+    if (chapterID !== '' && pageID !== '') {
+      handleCreateHistory()
+    }
+  }, [pageID, pagePath, chapterID])
+  return pageID !== '' &&
+    pagePath !== '' &&
+    chapterID !== '' ? (
     <View>
       <ZoomableScrollView
         scrollable={!isCropping}
@@ -53,22 +65,22 @@ export default (): JSX.Element => {
           if (pageX < width / 2) {
             const res = await fetch(
               `${SERVER_API_URL}/page/${pageID}/prev`,
-              'GET'
+              'GET',
+              ['manga_image']
             )
             page = res.page
           } else {
             const res = await fetch(
               `${SERVER_API_URL}/page/${pageID}/next`,
-              'GET'
+              'GET',
+              ['manga_image']
             )
             page = res.page
           }
           // TODO: handler no page found-> redirect to new page stating no page found
-          navigation.navigate('MangaPage', {
-            pageID: page.id,
-            chapterID: page.chapterId,
-            pagePath: page.path,
-          })
+          setChapterID(page.chapterId)
+          setPageID(page.id)
+          setPagePath(page.path)
         }}
       >
         <ImageCropper
@@ -78,18 +90,14 @@ export default (): JSX.Element => {
         >
           <ShimmerPlaceholder fallback={<PageShimmer />}>
             <Image
-              style={{
-                height: height - headerHeight - 80,
-                width: width,
-              }}
-              source={{
-                uri: `${SERVER_STATIC_URL}/${pagePath}`,
-              }}
-              resizeMode="contain"
+              key="manga_image"
+              width={width}
+              height={height - headerHeight - 80}
+              imageUri={`${SERVER_STATIC_URL}/${pagePath}`}
             />
           </ShimmerPlaceholder>
         </ImageCropper>
       </ZoomableScrollView>
     </View>
-  )
+  ) : null
 }

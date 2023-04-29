@@ -11,15 +11,20 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import Icon from 'react-native-vector-icons/Ionicons'
 import HomeScreen from './src/view/home/HomeScreen.react'
 import SettingsScreen from './src/view/settings/SettingsScreen.react'
-import { ApiFetcherContext } from './src/context/ApiFetcherContext'
+import {
+  ApiFetcherContext,
+  TLoadingMap,
+} from './src/context/ApiFetcherContext'
 
 const Tab = createBottomTabNavigator()
 
 export default function App(): JSX.Element {
-  const [loading, setLoading] = useState<boolean>(false)
+  const [loadingMap, setLoadingMap] = useState<TLoadingMap>(
+    {}
+  )
   return (
     <ApiFetcherContext.Provider
-      value={{ loading, setLoading }}
+      value={{ loadingMap, setLoadingMap }}
     >
       <NavigationContainer>
         <Tab.Navigator

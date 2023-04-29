@@ -6,19 +6,26 @@ import {
 } from '../utils/apiHelper'
 
 export default (): any => {
-  const { setLoading } = useApiFetcherContext()
+  let { loadingMap, setLoadingMap } = useApiFetcherContext()
   const handlerApiFetcher = useCallback(
     async (
       url: string,
       method: API_METHOD_TYPE,
+      keys: Array<string> = [],
       body?: any
     ) => {
-      setLoading(true)
+      for (let key of keys) {
+        loadingMap[key] = true
+      }
+      setLoadingMap({ ...loadingMap })
       const response = await fetchApi(url, method, body)
-      setLoading(false)
+      for (let key of keys) {
+        loadingMap[key] = false
+      }
+      setLoadingMap({ ...loadingMap })
       return response
     },
-    [setLoading, fetchApi]
+    [setLoadingMap, fetchApi]
   )
 
   return handlerApiFetcher

@@ -80,7 +80,6 @@ export default (): JSX.Element => {
                 `${SERVER_API_URL}/page/${id}/first`,
                 'GET'
               )
-              console.log(page)
               navigation.navigate('MangaPage', {
                 pageID: page.id,
                 pagePath: page.path,
