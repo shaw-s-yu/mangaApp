@@ -46,7 +46,7 @@ def hello_world():
     croppedImage = targetImage.crop((int(croppedLeft*2), int(croppedTop*2), int(croppedRight*2), int(croppedBottom*2)))
 
     text = mocr(croppedImage)
-
+    print('translating:', text)
     english = translator.translate(text)
     translatedEnglish = str(english.text)
 
