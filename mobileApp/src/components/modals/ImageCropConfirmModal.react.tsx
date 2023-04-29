@@ -125,6 +125,7 @@ export default function ImageCropConfirmModal({
               onPress={() => {
                 setEnglish('')
                 setMandarin('')
+                setOriginal('')
                 onHide()
               }}
             >
@@ -135,7 +136,7 @@ export default function ImageCropConfirmModal({
               onPress={async () => {
                 const { english, mandarin, original } =
                   await fetchApi(
-                    'http://127.0.0.1:8000/translate',
+                    'http://192.168.0.127:8000/translate',
                     'POST',
                     [
                       'text_english',
