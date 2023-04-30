@@ -1,18 +1,12 @@
 import { useState } from 'react'
-import {
-  Image,
-  Modal,
-  Text,
-  TouchableHighlight,
-  View,
-  useWindowDimensions,
-} from 'react-native'
+import { View, useWindowDimensions } from 'react-native'
 import ImageCropConfirmModal from './modals/ImageCropConfirmModal.react'
 import { useHeaderHeight } from '@react-navigation/elements'
 
 type Props = {
   children: JSX.Element
   isCropping: boolean
+  isScrolling: boolean
   imageUri: string
   pressDuration?: number
   setIsCropping: (cropping: boolean) => void
@@ -21,8 +15,9 @@ type Props = {
 export default function ImageCropper({
   children,
   isCropping,
+  isScrolling,
   imageUri,
-  pressDuration = 1000,
+  pressDuration = 500,
   setIsCropping,
 }: Props): JSX.Element {
   const [cropStartX, setCropStartX] = useState<
@@ -69,6 +64,9 @@ export default function ImageCropper({
         )}
       <View
         onTouchStart={(event) => {
+          if (isScrolling) {
+            return
+          }
           const { locationX, locationY } = event.nativeEvent
           setCropEndX(locationX)
           setCropEndY(locationY)
@@ -83,9 +81,7 @@ export default function ImageCropper({
           )
         }}
         onTouchMove={(event) => {
-          //   console.log('hi')
-          //   event.stopPropagation()
-          if (duration < pressDuration) {
+          if (duration < pressDuration || isScrolling) {
             return
           }
           const { locationX, locationY } = event.nativeEvent

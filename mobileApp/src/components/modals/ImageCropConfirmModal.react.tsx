@@ -12,6 +12,7 @@ import { Suspense, useState } from 'react'
 import ShimmerPlaceholder from '../shimmers/ShimmerPlaceholder.react'
 import TranslatedTextShimmer from '../shimmers/TranslatedTextShimmer.react'
 import useApiFetcher from '../../hooks/useApiFetcher'
+import { SERVER_TRANSLATOR_URL } from '../../utils/config'
 
 type Props = {
   isShown: boolean
@@ -35,7 +36,9 @@ export default function ImageCropConfirmModal({
   const { height: imageHeight, width: imageWidth } =
     useWindowDimensions()
   const headerHeight = useHeaderHeight()
-  const [original, setOriginal] = useState<string>('')
+  const [original, setOriginal] = useState<
+    Array<{ [key: string]: string }>
+  >([])
   const [english, setEnglish] = useState<string>('')
   const [mandarin, setMandarin] = useState<string>('')
   const fetchApi = useApiFetcher()
@@ -68,7 +71,7 @@ export default function ImageCropConfirmModal({
 
           <View>
             <View>
-              {original !== '' && (
+              {original.length > 0 && (
                 <Text style={styles.textContainer}>
                   Original:
                 </Text>
@@ -76,12 +79,34 @@ export default function ImageCropConfirmModal({
               <ShimmerPlaceholder
                 fallback={<TranslatedTextShimmer />}
               >
-                <Text
-                  key="text_original"
-                  style={styles.textContainer}
-                >
-                  {original}
-                </Text>
+                <View style={styles.jaTextBox}>
+                  <Text
+                    key="text_original"
+                    style={styles.textContainer}
+                  >
+                    {original.map((word, index) => (
+                      <View
+                        style={styles.japaneseBox}
+                        key={index}
+                      >
+                        <Text
+                          style={[
+                            styles.kanji,
+                            word['hira'] !== word['orig'] &&
+                              styles.fontBold,
+                          ]}
+                        >
+                          {word['orig']}
+                        </Text>
+                        <Text>
+                          {word['hira'] === word['orig']
+                            ? ''
+                            : word['hira']}
+                        </Text>
+                      </View>
+                    ))}
+                  </Text>
+                </View>
               </ShimmerPlaceholder>
             </View>
             <View>
@@ -125,7 +150,7 @@ export default function ImageCropConfirmModal({
               onPress={() => {
                 setEnglish('')
                 setMandarin('')
-                setOriginal('')
+                setOriginal([])
                 onHide()
               }}
             >
@@ -136,7 +161,7 @@ export default function ImageCropConfirmModal({
               onPress={async () => {
                 const { english, mandarin, original } =
                   await fetchApi(
-                    'http://192.168.0.127:8000/translate',
+                    `${SERVER_TRANSLATOR_URL}/translate`,
                     'POST',
                     [
                       'text_english',
@@ -228,5 +253,18 @@ const styles = StyleSheet.create({
     fontFamily: 'arial',
     color: 'rgb(21, 92, 161)',
     fontSize: 24,
+  },
+  kanji: {
+    fontSize: 18,
+  },
+  japaneseBox: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  jaTextBox: {
+    paddingLeft: 12,
+  },
+  fontBold: {
+    fontWeight: 'bold',
   },
 })

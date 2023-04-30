@@ -14,6 +14,7 @@ type Props = {
   scrollable?: boolean
   onPress?: (event: GestureResponderEvent) => void
   onLongPress?: (event: GestureResponderEvent) => void
+  setIsScrolling?: (event: boolean) => void
   style?: StyleProp<ViewStyle>
   containerStyle?: StyleProp<ViewStyle>
 }
@@ -22,9 +23,10 @@ export default function ZoomableScrollView({
   minZoomScale = 0.5,
   maxZoomScale = 3,
   scrollable = true,
-  pressDuration = 1000,
+  pressDuration = 500,
   onPress,
   onLongPress,
+  setIsScrolling = () => {},
   style,
   containerStyle,
 }: Props): JSX.Element {
@@ -39,6 +41,8 @@ export default function ZoomableScrollView({
         minimumZoomScale={minZoomScale}
         maximumZoomScale={maxZoomScale}
         scrollEnabled={scrollable}
+        onScroll={() => setIsScrolling(true)}
+        onMomentumScrollEnd={() => setIsScrolling(false)}
         onTouchStart={() => {
           setMoved(false)
           setDuration(0)

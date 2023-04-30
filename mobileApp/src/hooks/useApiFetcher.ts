@@ -22,7 +22,9 @@ export default (): any => {
       for (let key of keys) {
         loadingMap[key] = false
       }
-      setLoadingMap({ ...loadingMap })
+      setTimeout(() => {
+        setLoadingMap({ ...loadingMap })
+      }, 500)
       return response
     },
     [setLoadingMap, fetchApi]

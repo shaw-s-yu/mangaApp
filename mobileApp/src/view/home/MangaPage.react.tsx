@@ -38,6 +38,8 @@ export default (): JSX.Element | null => {
   const headerHeight = useHeaderHeight()
   const [isCropping, setIsCropping] =
     useState<boolean>(false)
+  const [isScrolling, setIsScrolling] =
+    useState<boolean>(false)
 
   useEffect(() => {
     const handleCreateHistory = async () =>
@@ -55,6 +57,7 @@ export default (): JSX.Element | null => {
     <View>
       <ZoomableScrollView
         scrollable={!isCropping}
+        setIsScrolling={setIsScrolling}
         style={{
           width: width,
           height: height - headerHeight - 80,
@@ -85,6 +88,7 @@ export default (): JSX.Element | null => {
       >
         <ImageCropper
           isCropping={isCropping}
+          isScrolling={isScrolling}
           imageUri={`${SERVER_STATIC_URL}/${pagePath}`}
           setIsCropping={setIsCropping}
         >

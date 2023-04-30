@@ -1,4 +1,10 @@
-import { Button, Text, View } from 'react-native'
+import {
+  Button,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native'
 import {
   RouteProp,
   useRoute,
@@ -10,6 +16,8 @@ import { SERVER_API_URL } from '../../utils/config'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { useIsFocused } from '@react-navigation/native'
 import useApiFetcher from '../../hooks/useApiFetcher'
+import MangaDetailShimmer from '../../components/shimmers/MangaDetailShimmer.react'
+import ShimmerPlaceholder from '../../components/shimmers/ShimmerPlaceholder.react'
 
 type ChapterType = {
   name: string
@@ -32,7 +40,8 @@ export default (): JSX.Element => {
     const handleFetchChapters = async () => {
       const { chapters } = await fetch(
         `${SERVER_API_URL}/chapter/${id}`,
-        'GET'
+        'GET',
+        ['detail_page']
       )
       setChapters([
         ...chapters.map(({ name = '', id = '' }) => ({
@@ -44,7 +53,8 @@ export default (): JSX.Element => {
     const handleFetchHistory = async () => {
       const { chapter, page } = await fetch(
         `${SERVER_API_URL}/history/${id}`,
-        'GET'
+        'GET',
+        ['detail_page']
       )
       setHistoryChapter(chapter)
       setHistoryPage(page)
@@ -55,42 +65,61 @@ export default (): JSX.Element => {
     }
   }, [id, setHistoryChapter, setHistoryPage, isFocused])
   return (
-    <View>
-      {historyChapter != null && historyPage != null && (
-        <Button
-          onPress={async () => {
-            const { page } = await fetch(
-              `${SERVER_API_URL}/page/${historyPage?.id}/current`,
-              'GET'
-            )
-            navigation.navigate('MangaPage', {
-              pageID: page.id,
-              pagePath: page.path,
-              chapterID: page.chapterId,
-            })
-          }}
-          title={`Resume read chapter ${historyChapter.name} page ${historyPage.index}`}
-        />
-      )}
-      {chapters.map(({ name, id }) => (
-        <View key={id}>
-          <TouchableOpacity
+    <ShimmerPlaceholder fallback={<MangaDetailShimmer />}>
+      <View key="detail_page">
+        {historyChapter != null && historyPage != null && (
+          <Button
             onPress={async () => {
-              const { page } = await fetch(
-                `${SERVER_API_URL}/page/${id}/first`,
-                'GET'
-              )
               navigation.navigate('MangaPage', {
-                pageID: page.id,
-                pagePath: page.path,
-                chapterID: page.chapterId,
+                pageID: historyPage.id,
+                pagePath: historyPage.path,
+                chapterID: historyPage.chapterId,
               })
             }}
-          >
-            <Text>{name}</Text>
-          </TouchableOpacity>
-        </View>
-      ))}
-    </View>
+            title={`Resume read chapter ${historyChapter.name} page ${historyPage.index}`}
+          />
+        )}
+        <ScrollView>
+          <View style={styles.chaptersContainer}>
+            {chapters.map(({ name, id }) => (
+              <View key={id} style={styles.chapterBox}>
+                <TouchableOpacity
+                  onPress={async () => {
+                    const { page } = await fetch(
+                      `${SERVER_API_URL}/page/${id}/first`,
+                      'GET'
+                    )
+                    navigation.navigate('MangaPage', {
+                      pageID: page.id,
+                      pagePath: page.path,
+                      chapterID: page.chapterId,
+                    })
+                  }}
+                >
+                  <Text>{name}</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+        </ScrollView>
+      </View>
+    </ShimmerPlaceholder>
   )
 }
+
+const styles = StyleSheet.create({
+  chaptersContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 24,
+    padding: 24,
+  },
+  chapterBox: {
+    borderStyle: 'solid',
+    borderColor: 'black',
+    borderWidth: 1,
+    padding: 8,
+    borderRadius: 10,
+  },
+})

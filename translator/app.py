@@ -2,9 +2,10 @@ from flask import Flask, request, jsonify
 import requests
 from io import BytesIO
 from PIL import Image
+import pykakasi
+kks = pykakasi.kakasi()
 # will convert the image to text string
 from manga_ocr import MangaOcr
-
 mocr = MangaOcr()
 
 # translates into preferred language
@@ -47,6 +48,7 @@ def hello_world():
 
     text = mocr(croppedImage)
     print('translating:', text)
+    result = kks.convert(text)
     english = translator.translate(text)
     translatedEnglish = str(english.text)
 
@@ -56,7 +58,7 @@ def hello_world():
     return {
         'english':translatedEnglish,
         'mandarin':translatedMandarin,
-        'original':text
+        'original':result
     }
 
 if __name__ == "__main__":
