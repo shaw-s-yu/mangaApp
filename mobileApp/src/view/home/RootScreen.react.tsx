@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import {
   Image,
+  StyleSheet,
   Text,
   TouchableOpacity,
   View,
@@ -13,6 +14,9 @@ import {
 } from '../../utils/config'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import MangaListShimmer from '../../components/shimmers/MangaListShimmer.react'
+import ShimmerPlaceholder from '../../components/shimmers/ShimmerPlaceholder.react'
+import useApiFetcher from '../../hooks/useApiFetcher'
 
 type MangaType = {
   name: string
@@ -22,17 +26,17 @@ type MangaType = {
 }
 
 export default function RootScreen(): JSX.Element {
-  const [loadingData, setLoadingData] =
-    useState<boolean>(true)
   const [mangas, setMangas] = useState<Array<MangaType>>([])
   const navigation =
     useNavigation<NativeStackNavigationProp<any>>()
+  const fetch = useApiFetcher()
 
   useEffect(() => {
     const handleFetchMangas = async () => {
-      const data = await fetchApi(
+      const data = await fetch(
         `${SERVER_API_URL}/manga`,
-        'GET'
+        'GET',
+        ['manga_list']
       )
       setMangas(
         (data?.mangas ?? []).map(
@@ -49,35 +53,53 @@ export default function RootScreen(): JSX.Element {
           })
         )
       )
-      setLoadingData(false)
     }
     handleFetchMangas()
   }, [])
 
   return (
-    <View>
-      <Text>Home</Text>
-      {loadingData && <LoadingSpinner />}
-      {mangas.map(
-        ({ name, previewImagePath, description, id }) => (
-          <View key={id}>
-            <TouchableOpacity
-              onPress={() => {
-                navigation.navigate('MangaDetail', { id })
-              }}
-            >
-              <Image
-                style={{ width: 480, height: 560 }}
-                source={{
-                  uri: `${SERVER_STATIC_URL}/${previewImagePath}`,
+    <ShimmerPlaceholder fallback={<MangaListShimmer />}>
+      <View style={styles.wrapper} key="manga_list">
+        {mangas.map(
+          ({ name, previewImagePath, description, id }) => (
+            <View key={id}>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate('MangaDetail', { id })
                 }}
-              />
-              <Text>{name}</Text>
-              <Text>{description}</Text>
-            </TouchableOpacity>
-          </View>
-        )
-      )}
-    </View>
+                style={styles.itemContainer}
+              >
+                <Image
+                  style={styles.image}
+                  source={{
+                    uri: `${SERVER_STATIC_URL}/${previewImagePath}`,
+                  }}
+                />
+                <Text>{name}</Text>
+                <Text>{description}</Text>
+              </TouchableOpacity>
+            </View>
+          )
+        )}
+      </View>
+    </ShimmerPlaceholder>
   )
 }
+
+const styles = StyleSheet.create({
+  image: {
+    width: 160,
+    height: 240,
+    borderRadius: 18,
+  },
+  wrapper: {
+    flexWrap: 'wrap',
+    flexDirection: 'row',
+    gap: 32,
+    padding: 24,
+  },
+  itemContainer: {
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+})

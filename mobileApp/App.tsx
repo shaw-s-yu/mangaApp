@@ -47,6 +47,7 @@ export default function App(): JSX.Element {
               )
             },
             tabBarStyle: { height: 80 },
+            headerShown: false,
           })}
         >
           <Tab.Screen name="Home" component={HomeScreen} />

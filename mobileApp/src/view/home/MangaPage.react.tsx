@@ -1,9 +1,15 @@
 import {
   RouteProp,
+  useNavigation,
   useRoute,
 } from '@react-navigation/native'
-import { useEffect, useState } from 'react'
-import { View, useWindowDimensions } from 'react-native'
+import { useEffect, useLayoutEffect, useState } from 'react'
+import {
+  StyleSheet,
+  Text,
+  View,
+  useWindowDimensions,
+} from 'react-native'
 import {
   SERVER_API_URL,
   SERVER_STATIC_URL,
@@ -28,6 +34,7 @@ export default (): JSX.Element | null => {
   const [chapterID, setChapterID] = useState<string>(
     currentChapterID
   )
+  const naviation = useNavigation()
   const [pageID, setPageID] =
     useState<string>(currentPageID)
   const [pagePath, setPagePath] =
@@ -40,7 +47,7 @@ export default (): JSX.Element | null => {
     useState<boolean>(false)
   const [isScrolling, setIsScrolling] =
     useState<boolean>(false)
-
+  const [pressedTime, setPressedTime] = useState<number>(0)
   useEffect(() => {
     const handleCreateHistory = async () =>
       await fetch(
@@ -51,6 +58,18 @@ export default (): JSX.Element | null => {
       handleCreateHistory()
     }
   }, [pageID, pagePath, chapterID])
+
+  useLayoutEffect(() => {
+    naviation.setOptions({
+      headerRight: () =>
+        pressedTime > 300 &&
+        !isScrolling && (
+          <View>
+            <Text style={styles.headerRight}>Cropping</Text>
+          </View>
+        ),
+    })
+  }, [pressedTime, naviation])
   return pageID !== '' &&
     pagePath !== '' &&
     chapterID !== '' ? (
@@ -62,6 +81,7 @@ export default (): JSX.Element | null => {
           width: width,
           height: height - headerHeight - 80,
         }}
+        pressedTime={pressedTime}
         onPress={async (e) => {
           const { pageX } = e.nativeEvent
           let page
@@ -90,6 +110,8 @@ export default (): JSX.Element | null => {
           isCropping={isCropping}
           isScrolling={isScrolling}
           imageUri={`${SERVER_STATIC_URL}/${pagePath}`}
+          pressedTime={pressedTime}
+          setPressedTime={setPressedTime}
           setIsCropping={setIsCropping}
         >
           <ShimmerPlaceholder fallback={<PageShimmer />}>
@@ -105,3 +127,10 @@ export default (): JSX.Element | null => {
     </View>
   ) : null
 }
+
+const styles = StyleSheet.create({
+  headerRight: {
+    marginRight: 24,
+    color: 'rgb(21, 92, 161)',
+  },
+})

@@ -11,13 +11,14 @@ import {
   useNavigation,
   NavigationProp,
 } from '@react-navigation/native'
-import { useEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useState } from 'react'
 import { SERVER_API_URL } from '../../utils/config'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { useIsFocused } from '@react-navigation/native'
 import useApiFetcher from '../../hooks/useApiFetcher'
 import MangaDetailShimmer from '../../components/shimmers/MangaDetailShimmer.react'
 import ShimmerPlaceholder from '../../components/shimmers/ShimmerPlaceholder.react'
+import Icon from 'react-native-vector-icons/Ionicons'
 
 type ChapterType = {
   name: string
@@ -35,6 +36,8 @@ export default (): JSX.Element => {
   const [historyChapter, setHistoryChapter] =
     useState<any>()
   const [historyPage, setHistoryPage] = useState<any>()
+  const [chapterOrderASC, setChapterOrderASC] =
+    useState<boolean>(true)
   const fetch = useApiFetcher()
   useEffect(() => {
     const handleFetchChapters = async () => {
@@ -64,12 +67,36 @@ export default (): JSX.Element => {
       handleFetchHistory()
     }
   }, [id, setHistoryChapter, setHistoryPage, isFocused])
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          onPress={() => {
+            setChapterOrderASC((datum) => !datum)
+            setChapters((datum) => datum.reverse())
+          }}
+          style={styles.headerRightArrow}
+        >
+          <Icon
+            name={
+              chapterOrderASC
+                ? 'chevron-up-outline'
+                : 'chevron-down-outline'
+            }
+            size={24}
+            color="rgb(21, 92, 161)"
+          />
+        </TouchableOpacity>
+      ),
+    })
+  }, [navigation, setChapterOrderASC, chapterOrderASC])
   return (
     <ShimmerPlaceholder fallback={<MangaDetailShimmer />}>
       <View key="detail_page">
         {historyChapter != null && historyPage != null && (
           <Button
             onPress={async () => {
+              console.log(historyPage)
               navigation.navigate('MangaPage', {
                 pageID: historyPage.id,
                 pagePath: historyPage.path,
@@ -114,6 +141,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: 24,
     padding: 24,
+    alignItems: 'stretch',
   },
   chapterBox: {
     borderStyle: 'solid',
@@ -121,5 +149,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 8,
     borderRadius: 10,
+    width: 48,
+    alignItems: 'center',
+  },
+  headerRightArrow: {
+    marginRight: 16,
   },
 })

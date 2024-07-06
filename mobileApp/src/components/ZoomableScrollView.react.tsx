@@ -2,6 +2,8 @@ import { useState } from 'react'
 import {
   GestureResponderEvent,
   StyleProp,
+  Text,
+  View,
   ViewStyle,
 } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
@@ -9,6 +11,7 @@ import { ScrollView } from 'react-native-gesture-handler'
 type Props = {
   children: JSX.Element
   pressDuration?: number
+  pressedTime: number
   minZoomScale?: number
   maxZoomScale?: number
   scrollable?: boolean
@@ -23,47 +26,37 @@ export default function ZoomableScrollView({
   minZoomScale = 0.5,
   maxZoomScale = 3,
   scrollable = true,
-  pressDuration = 500,
+  pressDuration = 300,
+  pressedTime,
   onPress,
   onLongPress,
   setIsScrolling = () => {},
   style,
   containerStyle,
 }: Props): JSX.Element {
-  const [duration, setDuration] = useState<number>(0)
   const [moved, setMoved] = useState<boolean>(false)
-  const [tempInterval, setTempInterval] =
-    useState<number>(0)
-
   return (
     <>
       <ScrollView
         minimumZoomScale={minZoomScale}
         maximumZoomScale={maxZoomScale}
+        pinchGestureEnabled={scrollable}
         scrollEnabled={scrollable}
         onScroll={() => setIsScrolling(true)}
-        onMomentumScrollEnd={() => setIsScrolling(false)}
         onTouchStart={() => {
           setMoved(false)
-          setDuration(0)
-          setTempInterval(
-            setInterval(
-              () => setDuration((d) => d + 100),
-              100
-            )
-          )
         }}
         onTouchEnd={(event) => {
-          clearInterval(tempInterval)
+          setIsScrolling(false)
           if (moved) {
-            setDuration(0)
             return
           }
-          if (duration > pressDuration) {
+          if (pressedTime > pressDuration) {
             onLongPress?.(event)
           } else {
             onPress?.(event)
           }
+          setMoved(false)
         }}
         onTouchMove={() => setMoved(true)}
         style={style}

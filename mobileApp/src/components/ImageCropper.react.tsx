@@ -9,6 +9,10 @@ type Props = {
   isScrolling: boolean
   imageUri: string
   pressDuration?: number
+  pressedTime: number
+  setPressedTime: React.Dispatch<
+    React.SetStateAction<number>
+  >
   setIsCropping: (cropping: boolean) => void
 }
 
@@ -17,7 +21,9 @@ export default function ImageCropper({
   isCropping,
   isScrolling,
   imageUri,
-  pressDuration = 500,
+  pressDuration = 300,
+  pressedTime,
+  setPressedTime,
   setIsCropping,
 }: Props): JSX.Element {
   const [cropStartX, setCropStartX] = useState<
@@ -36,14 +42,10 @@ export default function ImageCropper({
   const [isModalShown, setIsModalShown] =
     useState<boolean>(false)
 
-  const [duration, setDuration] = useState<number>(0)
-  const [tempInterval, setTempInterval] =
-    useState<number>(0)
-
-  const { height: imageHeight, width: imageWidth } =
-    useWindowDimensions()
-  const headerHeight = useHeaderHeight()
-
+  const [tempInterval, setTempInterval] = useState<
+    Array<number>
+  >([])
+  //   console.log(pressedTime, tempInterval)
   return (
     <>
       {cropStartX !== null &&
@@ -64,24 +66,22 @@ export default function ImageCropper({
         )}
       <View
         onTouchStart={(event) => {
-          if (isScrolling) {
-            return
-          }
           const { locationX, locationY } = event.nativeEvent
           setCropEndX(locationX)
           setCropEndY(locationY)
           setCropStartX(locationX)
           setCropStartY(locationY)
-          setDuration(0)
-          setTempInterval(
-            setInterval(
-              () => setDuration((d) => d + 100),
+          setPressedTime(0)
+          setTempInterval((intervals) => {
+            const intervalNumber = setInterval(
+              () => setPressedTime((time) => time + 100),
               100
             )
-          )
+            return [...intervals, intervalNumber]
+          })
         }}
         onTouchMove={(event) => {
-          if (duration < pressDuration || isScrolling) {
+          if (pressedTime < pressDuration || isScrolling) {
             return
           }
           const { locationX, locationY } = event.nativeEvent
@@ -90,12 +90,16 @@ export default function ImageCropper({
           setCropEndY(locationY)
         }}
         onTouchEnd={(event) => {
+          tempInterval.forEach((interval) =>
+            clearInterval(interval)
+          )
+          setTempInterval([])
+          setIsCropping(false)
+          setPressedTime(0)
           if (isCropping) {
             event.stopPropagation()
             setIsModalShown(true)
           }
-          setIsCropping(false)
-          clearInterval(tempInterval)
         }}
       >
         {children}

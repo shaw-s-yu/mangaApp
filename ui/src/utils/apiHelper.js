@@ -4,7 +4,6 @@ export const fetchApi = async (url, method, body) => {
             method,
             body
         })
-        console.log(response)
         if (response.status !== 200) {
             alert(`failed`)
         }

@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import { useState } from 'react'
 import {
   Button,
   StyleSheet,
@@ -6,11 +6,11 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-} from 'react-native';
-import LoadingSpinnerReact from '../../components/LoadingSpinner.react';
-import {fetchApi} from '../../utils/apiHelper';
-import {SERVER_API_URL} from '../../utils/config';
-import {launchImageLibrary} from 'react-native-image-picker';
+} from 'react-native'
+import LoadingSpinnerReact from '../../components/LoadingSpinner.react'
+import { fetchApi } from '../../utils/apiHelper'
+import { SERVER_API_URL } from '../../utils/config'
+import { launchImageLibrary } from 'react-native-image-picker'
 
 const styles = StyleSheet.create({
   input: {
@@ -23,15 +23,15 @@ const styles = StyleSheet.create({
     width: 240,
     height: 360,
   },
-});
+})
 
 export default (): JSX.Element => {
-  const [mangaName, setMangaName] = useState('');
+  const [mangaName, setMangaName] = useState('')
   const [mangaDescription, setMangaDescription] =
-    useState('');
-  const [path, setPath] = useState('');
-  const [previewImage, setPreviewImage] = useState<any>();
-  const [loading, setLoading] = useState(false);
+    useState('')
+  const [path, setPath] = useState('')
+  const [previewImage, setPreviewImage] = useState<any>()
+  const [loading, setLoading] = useState(false)
 
   return (
     <View>
@@ -57,17 +57,18 @@ export default (): JSX.Element => {
         title="Select Preview Image"
         onPress={async () => {
           try {
-            const {assets} = await launchImageLibrary({
+            const { assets } = await launchImageLibrary({
               mediaType: 'photo',
-            });
-            const {fileName, type, uri} = assets?.[0] ?? {};
+            })
+            const { fileName, type, uri } =
+              assets?.[0] ?? {}
             setPreviewImage({
               name: fileName,
               type,
               uri,
-            });
+            })
           } catch (e) {
-            console.warn(e);
+            console.warn(e)
           }
         }}
       />
@@ -87,23 +88,23 @@ export default (): JSX.Element => {
           path == null
         }
         onPress={async () => {
-          setLoading(true);
-          const formdata = new FormData();
-          formdata.append('previewImage', previewImage);
-          formdata.append('mangaName', mangaName);
+          setLoading(true)
+          const formdata = new FormData()
+          formdata.append('previewImage', previewImage)
+          formdata.append('mangaName', mangaName)
           formdata.append(
             'mangaDescription',
-            mangaDescription,
-          );
-          formdata.append('path', path);
+            mangaDescription
+          )
+          formdata.append('path', path)
           const response = await fetchApi(
             `${SERVER_API_URL}/manga`,
             'POST',
-            formdata,
-          );
-          setLoading(false);
-          console.log(response);
-        }}>
+            formdata
+          )
+          setLoading(false)
+        }}
+      >
         <View>
           <Text>
             {loading && <LoadingSpinnerReact />}Submit
@@ -111,5 +112,5 @@ export default (): JSX.Element => {
         </View>
       </TouchableOpacity>
     </View>
-  );
-};
+  )
+}

@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   history: {
-    width: 2,
+    width: 300,
     height: 32,
   },
   chaptersContainer: {
@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 8,
     borderRadius: 10,
-    width: 24,
-    height: 24,
+    width: 48,
+    height: 32,
   },
 })
